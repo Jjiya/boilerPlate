@@ -26,15 +26,12 @@ mongoose.connect( config.mongoURI, {
   .catch(err => console.log(err))
 
 
-
-
 app.get('/', (req, res) => {
   res.send('Hello World! Hello Node.js (●ˇ∀ˇ●)')
 })
 
 app.post('/register', (req,res) => {
   //회원 가입 시 필요한 정보를 client에서 가져오면 db에 넣어준다.
-
   /*
    {
       id: "hello",
