@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const saltRounds = 10
 const jsonwebtoken = require('jsonwebtoken')
+let tokenKey = "userToken";    // 토큰 코드 생성 시 조합단어를 sign()에 안넣고 내 혼자 따로 빼놓음
 
 const userSchema = mongoose.Schema({
     name: {
@@ -29,8 +30,6 @@ const userSchema = mongoose.Schema({
     token: String,
     tokenExp: Number
 })
-
-
 
 userSchema.pre('save', function(next){
     let user = this;
@@ -67,17 +66,33 @@ userSchema.methods.comparePassword = function(plainPassword, callback){
 userSchema.methods.generateToken = function(callback){
     let user = this;
     //jsonwebtoken을 이용해 token생성
-    let genToken = jsonwebtoken.sign(user._id.toHexString(), "userToken")
+    let token = jsonwebtoken.sign(user._id.toHexString(), tokenKey)
     //console.log("user.id (hexString안한 것) : " + user.id);
-    console.log("userToken 생성 : " + genToken);
-    user.token = genToken;
+    console.log("userToken 생성 : " + token);
+    user.token = token;
 
     user.save((err, user) => {
         if(err) return callback(err);
         callback(null, user);
     })
-}
+}// end of generateToken()
 
+userSchema.methods.findByToken = function(token, callback){
+    let user = this;
+
+    //token decode하기
+    jsonwebtoken.verify(token, tokenKey, function(err, decoded){    //여기의 decoded는 decoded된 후의 _id를 의미
+        //유저 아이디를 이용해 유저를 찾은 다음 클라이언트에서 가져온 토큰과 DB에 보관된 토큰이 일치하는지 확인
+        user.findOne({
+            //user의 _id로 find하는데, _id 값은 decoded임
+            "_id": decoded,
+            "token": token
+        }, function(err,userInfo){
+            if(err) return callback(err);
+            callback(null, user)
+        })
+    })
+}
 
 const User = mongoose.model('User', userSchema)
 

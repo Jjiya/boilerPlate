@@ -12,6 +12,9 @@ const cookieParser = require('cookie-parser');
 // mongoDB의 연결 URI를 key.js에서 가져옴
 const config = require("./config/key");
 
+//auth기능 구현을 위해 만든 auth.js파일 내 기능을 가져옴
+const {auth} = require('./middleware/auth');
+
 // 사용자가 입력한 정보를 서버에서 가져올 때 분석해서 가지고 올 수 있게 해줌
 app.use(bodyParser.urlencoded({extended: true}));
 // json타입으로 된 정보를 분석해서 가져오기 위함
@@ -38,7 +41,7 @@ app.get('/', (req, res) => {
   res.send('Hello World! Hello Node.js (●ˇ∀ˇ●)')
 })
 
-app.post('/register', (req,res) => {
+app.post('/api/users/register', (req,res) => {
   //회원 가입 시 필요한 정보를 client에서 가져오면 db에 넣어준다.
   /*
    {
@@ -57,9 +60,9 @@ app.post('/register', (req,res) => {
     if(err) return res.json({ success: false, err })
     return res.status(200).json({ success: true })
   })
-})
+})//end of app.post('/register')
 
-app.post('/login',(req,res) => {
+app.post('/api/users/login',(req,res) => {
   //요청된 email이 DB에 있는지 찾는다.
   User.findOne({email: req.body.email}, (err,userInfo) =>{
     if(!userInfo){
@@ -90,13 +93,26 @@ app.post('/login',(req,res) => {
         })// end of res.cookie()
       })//end of generateToken()
     })//end of comparePassword()
+  })// end of findOne()
+})// end of app.post('/login')
+
+
+app.get('/api/users/auth', auth, (req,res) => {
+  //여기까지 미들웨어(get 매개변수 중간의 auth)를 통과해 왔다는 얘기는 Authentication가 true라는 말
+  console.log('Authentication == true');
+
+  req.status(200).json({
+    _id: req.user._id,
+    //request에 담겨있는 user의 role 값이 0이면 false(일반 유저), 0이 아니면 관리자
+    isAdmin: req.user.role === 0 ? false : true,
+    isAuth: true,
+    email: req.user.email,
+    name: req.user.name,
+    lastname: req.user.lastname,
+    role: req.user.role,
+    image: req.user.image
   })
-
-
 })
-
-
-
 
 
 
