@@ -77,7 +77,7 @@ userSchema.methods.generateToken = function(callback){
     })
 }// end of generateToken()
 
-userSchema.methods.findByToken = function(token, callback){
+userSchema.statics.findByToken = function(token, callback){
     let user = this;
 
     //token decode하기
@@ -87,7 +87,7 @@ userSchema.methods.findByToken = function(token, callback){
             //user의 _id로 find하는데, _id 값은 decoded임
             "_id": decoded,
             "token": token
-        }, function(err,userInfo){
+        }, function(err,user){
             if(err) return callback(err);
             callback(null, user)
         })

@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node server/index.js",
+    "frontend": "nmp run start --prefix client",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "jjiya",
