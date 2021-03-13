@@ -35,8 +35,6 @@ function LoginPage(props) {
                 alert("Error!!");
             }
         })
-
-
     }
 
     return (
