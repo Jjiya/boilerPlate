@@ -10,7 +10,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 
 // mongoDB의 연결 URI를 key.js에서 가져옴
-const config = require("./server/config/key");
+const config = require("./config/key");
 
 //auth기능 구현을 위해 만든 auth.js파일 내 기능을 가져옴
 const { auth } = require('./config/middleware/auth');
@@ -41,6 +41,11 @@ mongoose.connect(config.mongoURI, {
 
 app.get('/', (req, res) => {
   res.send('Hello World! Hello Node.js (●ˇ∀ˇ●)')
+})
+
+// react서버와 처음 연동하는 부분
+app.get('/api/hello', (req,res) => {
+  res.send("안녕하세요");
 })
 
 app.post('/api/users/register', (req, res) => {
